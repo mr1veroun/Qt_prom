@@ -3,7 +3,8 @@
 #include "database.h"
 
 
-QByteArray parsing(QString data_from_client){
+QByteArray parsing(QString data_from_client)//Функция парсинга, получает строку и манипулирует в зависимости от введенной команды.
+{
     QStringList clue_words = data_from_client.split(QLatin1Char('&'));
     QString action_type = clue_words.front();
     if (clue_words.length() != 3)
@@ -24,27 +25,20 @@ QByteArray parsing(QString data_from_client){
 
 }
 
-QByteArray reg(QString login, QString password){
+QByteArray reg(QString login, QString password)//Функция регистрации, создает новую запись с пользователем в БД. Формат: reg&login&password
+{
     QString query = QString("INSERT INTO Users ('username', 'password') VALUES (%1, %2);").arg(login, password);
     Database::getInstance()->send_query(query);
     return login.toUtf8() + " has been signed up";
 }
-QByteArray auth(QString login, QString password){
+QByteArray auth(QString login, QString password) //Функция авторизации: возвращает success, если пароли в БД и введенный совпадают. Формат: auth&login&password
+{
     password.remove("\r\n");
     QString query = QString("SELECT password FROM Users WHERE username = '%1';").arg(login);
-    QSqlQuery res = Database::getInstance()->send_query(query);
-    if (!res.isActive()){
-        qDebug() << "Invalid query:" << res.lastError().text();
-        return "";
-    }
-
-    QSqlRecord rec = res.record();
-    qDebug() << rec.indexOf("password");
-    QString opassword = "";
-    while (res.next())
-        opassword = res.value(rec.indexOf("password")).toString();
-    qDebug() << opassword << " " << password;
-    if (opassword != password)
+    QStringList res = Database::getInstance()->send_query(query);
+    if (res.length() == 0)
+        return "Error";
+    if (res[0] != password)
         return "Wrong password";
     else
         return "Success";
