@@ -1,8 +1,8 @@
-#include "mytcpserver.h"
+﻿#include "mytcpserver.h"
+#include "functionserver.h"
 #include <QDebug>
 #include <QCoreApplication>
-#include <QString>
-#include "functionserver.h"
+#include<QString>
 
 MyTcpServer::~MyTcpServer()
 {
@@ -25,34 +25,36 @@ MyTcpServer::MyTcpServer(QObject *parent) : QObject(parent){
     }
 }
 
-void MyTcpServer::slotNewConnection(){
- //   if(server_status==1){
-        mTcpSocket = mTcpServer->nextPendingConnection();
-        mTcpSocket->write("Hello, World!!! I am echo server!\r\n");
-        connect(mTcpSocket, &QTcpSocket::readyRead,this,&MyTcpServer::slotServerRead);
-        connect(mTcpSocket,&QTcpSocket::disconnected,this,&MyTcpServer::slotClientDisconnected);
-   // }
+void MyTcpServer::slotNewConnection()
+{
+    QTcpSocket *newSocket = mTcpServer->nextPendingConnection();
+    mTcpSockets.append(newSocket);
+
+    newSocket->write("Hello, World!!! I am echo server!\r\n");
+
+    connect(newSocket, &QTcpSocket::readyRead, this, &MyTcpServer::slotServerRead);
+    connect(newSocket, &QTcpSocket::disconnected, this, &MyTcpServer::slotClientDisconnected);
 }
 
-void MyTcpServer::slotServerRead(){
-    QString res = "";
-    while(mTcpSocket->bytesAvailable()>0)
+
+void MyTcpServer::slotServerRead()
+{
+    QTcpSocket *socket = qobject_cast<QTcpSocket*>(sender());
+
+        QByteArray response = socket->readAll();
+        QString message = QString::fromUtf8(response).trimmed();
+        qDebug() << "Received message: " << message;
+        socket->write(parsing(message));
+
+}
+
+void MyTcpServer::slotClientDisconnected()
+{
+    QTcpSocket *disconnectedSocket = qobject_cast<QTcpSocket*>(sender());
+    if (disconnectedSocket)
     {
-        QByteArray array =mTcpSocket->readAll();
-        qDebug()<<array<<" need";
-        if(array=="\x01")
-        {
-            mTcpSocket->write(res.toUtf8());
-            res = "";
-        }
-        else
-            res.append(array);
+        mTcpSockets.removeOne(disconnectedSocket);
+        disconnectedSocket->deleteLater();
     }
-    QByteArray to_write = parsing(res);
-    mTcpSocket->write(parsing(res));
-
 }
 
-void MyTcpServer::slotClientDisconnected(){
-    mTcpSocket->close();
-}
