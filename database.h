@@ -25,7 +25,7 @@ protected:
 public:
     static Database* getInstance();
 
-    QStringList send_query(QString queryStr);
+    QStringList send_query(QString queryStr, bool is_selection);
 
     bool connect();
 

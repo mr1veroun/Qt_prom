@@ -17,20 +17,21 @@
         return p_instance;
     }
 
-    QStringList Database::send_query(QString queryStr) //Отправляет запрос и возвращает список значений, возвращенных запросом типа string. Аргумент: SQL запрос в виде строки
+    QStringList Database::send_query(QString queryStr, bool is_selection) //Отправляет запрос и возвращает список значений, возвращенных запросом типа string. Аргумент: SQL запрос в виде строки
     {
         QSqlQuery query;
         QStringList list;
         query.prepare(queryStr);
-        if (!query.exec())
-            qDebug() << "Invalid query:" << query.lastError().text();;
-
-        if (!query.isActive()){
-            qDebug() << "Invalid query:" <<query.lastError().text();
+        if (!query.exec()){
+            qDebug() << "Invalid query:" << query.lastError().text();
+            list.append("!0!");
+            return list;
+        }
+        if (!is_selection){
+            list.append("!1!");
             return list;
         }
 
-        QSqlRecord rec = query.record();
         while (query.next())
             list.append(query.value(0).toString());
         return list;

@@ -24,7 +24,8 @@ SOURCES += \
     main.cpp \
     mytcpserver.cpp \
     functionserver.cpp \
-    singl_client.cpp
+    singl_client.cpp \
+    sha-256.cpp \
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -35,4 +36,5 @@ HEADERS += \
     mytcpserver.h \
     database.h \
     functionserver.h \
-    singl_client.h
+    singl_client.h \
+    sha-256.h \
