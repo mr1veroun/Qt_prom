@@ -5,7 +5,7 @@ singl_client* singl_client::m_instance = nullptr;
 singl_client::singl_client(QObject *parent) : QObject(parent)
 {
     connect(&m_socket, &QTcpSocket::readyRead, this, &singl_client::onReadyRead);
-    m_socket.connectToHost("server_address", 1234); // Change to your server address and port
+    m_socket.connectToHost("127.0.0.1", 33333); // Change to your server address and port
 }
 
 singl_client* singl_client::instance()
