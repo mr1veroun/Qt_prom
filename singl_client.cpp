@@ -1,51 +1,43 @@
 #include "singl_client.h"
-#include <QObject>
-#include <QTcpSocket>
 
-class ServerConnection : public QObject
+singl_client* singl_client::m_instance = nullptr;
+
+singl_client::singl_client(QObject *parent) : QObject(parent)
 {
-    Q_OBJECT
+    connect(&m_socket, &QTcpSocket::readyRead, this, &singl_client::onReadyRead);
+    m_socket.connectToHost("server_address", 1234); // Change to your server address and port
+}
 
-public:
-    static ServerConnection* instance()
-    {
-        static ServerConnection* connection = new ServerConnection();
-        return connection;
-    }
+singl_client* singl_client::instance()
+{
+    if (!m_instance)
+        m_instance = new singl_client();
+    return m_instance;
+}
 
-    void connectToServer(const QString& ipAddress, int port)
-    {
-        if (!m_socket->isOpen())
-        {
-            m_socket->connectToHost(ipAddress, port);
-            connect(m_socket, &QTcpSocket::readyRead, this, &ServerConnection::readData);
-        }
-    }
+void singl_client::sendRequest(const QString& request)
+{
+    if (m_socket.state() == QAbstractSocket::ConnectedState)
+        m_socket.write(request.toUtf8());
+}
 
-    void sendData(const QString& data)
-    {
-        if (m_socket->isOpen())
-        {
-            m_socket->write(data.toUtf8());
-            m_socket->flush();
-        }
-    }
+void singl_client::onReadyRead()
+{
+    QString response = QString::fromUtf8(m_socket.readAll());
+    emit responseReceived(response);
+}
 
-signals:
-    void receivedData(const QString& data);
 
-private slots:
-    void readData()
-    {
-        QString data = QString::fromUtf8(m_socket->readAll());
-        emit receivedData(data);
-    }
 
-private:
-    ServerConnection(QObject* parent = nullptr)
-        : QObject(parent), m_socket(new QTcpSocket(this))
-    {
-    }
 
-    QTcpSocket* m_socket;
-};
+
+
+
+
+
+
+
+
+
+
+

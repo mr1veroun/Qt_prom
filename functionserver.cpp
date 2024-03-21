@@ -43,6 +43,8 @@ QByteArray auth(QString login, QString password) //Функция авториз
     else
         return "Success";
 
+
+
     }
 
 
