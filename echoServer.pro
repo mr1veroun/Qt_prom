@@ -24,8 +24,10 @@ SOURCES += \
     main.cpp \
     mytcpserver.cpp \
     functionserver.cpp \
+    rsa.cpp \
+    sha-384.cpp \
     singl_client.cpp \
-    sha-256.cpp \
+    steganography.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -36,5 +38,7 @@ HEADERS += \
     mytcpserver.h \
     database.h \
     functionserver.h \
+    rsa.h \
+    sha-384.h \
     singl_client.h \
-    sha-256.h \
+    steganography.h

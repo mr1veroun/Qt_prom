@@ -1,6 +1,7 @@
 #include <database.h>
 #include <QCoreApplication>
 
+Database* Database::p_instance = 0;
 
     Database::~Database() {
         if (m_database.isOpen())

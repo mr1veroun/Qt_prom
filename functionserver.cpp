@@ -1,7 +1,7 @@
 #include "functionserver.h"
 #include "QDebug"
 #include "database.h"
-#include "sha-256.h"
+#include "sha-384.h"
 
 QByteArray parsing(QString data_from_client)//Функция парсинга, получает строку и манипулирует в зависимости от введенной команды.
 {
@@ -27,7 +27,7 @@ QByteArray parsing(QString data_from_client)//Функция парсинга, �
 
 QByteArray reg(QString login, QString password)//Функция регистрации, создает новую запись с пользователем в БД. Формат: reg&login&password
 {
-    std::string sha_password = sha256(password.toStdString());
+    std::string sha_password = sha384(password.toStdString());
     password = QString::fromUtf8(sha_password.c_str());
     QString query = QString("INSERT INTO Users ('username', 'password') VALUES ('%1', '%2');").arg(login, password);
     QStringList res = Database::getInstance()->send_query(query, false);
@@ -45,7 +45,7 @@ QByteArray auth(QString login, QString password) //Функция авториз
     QStringList res = Database::getInstance()->send_query(query, true);
     if (res.length() == 0)
         return "Error";
-    std::string sha_password = sha256(password.toStdString());
+    std::string sha_password = sha384(password.toStdString());
     password = QString::fromUtf8(sha_password.c_str());
     if (res[0] != password)
         return "Wrong password";

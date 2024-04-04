@@ -3,7 +3,7 @@
 #include "database.h"
 
 
-Database* Database::p_instance = 0;
+
 
 int main(int argc, char *argv[])
 {
